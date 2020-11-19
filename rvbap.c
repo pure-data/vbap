@@ -21,6 +21,8 @@ See copyright in file with name LICENSE.txt  */
 #include "m_pd.h"               /* you must include this - it contains the external object's link to pure data */
 #endif
 
+#define RVBAP_VERSION "rvbap v1.2 - (c) Olaf Matthes 2003-2007, based on vbap by Ville Pulkki"
+
 #define MAX_LS_SETS 100         // maximum number of loudspeaker sets (triplets or pairs) allowed
 #define MAX_LS_AMOUNT 55        // maximum amount of loudspeakers, can be increased
 
@@ -138,7 +140,7 @@ int main(void)
     addftx((method)rvbap_ft3, 3);
     addftx((method)rvbap_ft4, 4);
     addmess((method)rvbap_matrix, "loudspeaker-matrices", A_GIMME, 0);
-    post("rvbap v1.1, © 2003-2007 by Olaf Matthes, based on vbap by Ville Pulkki");
+    post(RVBAP_VERSION);
 	return 0;
 }
 

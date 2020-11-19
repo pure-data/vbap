@@ -1,5 +1,19 @@
-14 Aug. 2014 update from version 1.0.3.2 to version  1.1
+2018 TBD version 1.2.0
 
-- changed vbap to allocate memory dynamically, to eliminate crash-producing memory overwrites when larger speaker configurations were defined (e.g. on OSX for speakers >  13 in 3D)   z.settel
-- eliminated a post to the console reporting azimuth updates
+* transitioned Makefile to use pd-lib-builder (Dan Wilcox)
+* added loudspeaker set definition and current active set info outlet (Chikashi Miyama)
+* lowered loudspeaker intersection epsilon for float-based math (Chikashi Miyama)
+* limit min spread size to avoid NaN explosion (Chikashi Miyama)
 
+* updated help files and removed pddp links for now (Dan Wilcox)
+* commented out a few more extraneous logposts
+* various formatting fixes
+
+2014 Aug 14 version 1.1.0
+
+* changed vbap to allocate memory dynamically, to eliminate crash-producing
+  memory overwrites when larger speaker configurations were defined, e.g. on
+  OSX for speakers > 13 in 3D (Z. Settel)
+* eliminated a post to the console reporting azimuth updates (Z. Settel)
+
+version 1.0.3.2 and earlier...

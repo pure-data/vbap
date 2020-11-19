@@ -8,6 +8,7 @@ Unversity of California at Berkeley
 See copyright in file with name LICENSE.txt  */
 
 #include "define_loudspeakers.h"
+#include <float.h>
 
 #ifndef VBAP_OBJECT
 # ifdef PD
@@ -21,7 +22,7 @@ void define_loudspeakers_setup(void)
 	class_addmethod(def_ls_class, (t_method)def_ls_read_directions, gensym("ls-directions"), A_GIMME, 0);	
 	class_addmethod(def_ls_class, (t_method)def_ls_read_triplets, gensym("ls-triplets"), A_GIMME, 0);
 
-	logpost(NULL,1, DFLS_VERSION);
+	post(DFLS_VERSION);
 }
 # else /* Max */
 void main(void)
@@ -201,7 +202,7 @@ void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 {
 	initContent_ls_directions(x,ac,av); // Initialize object internal data from a ls-directions list
 
-    logpost(NULL,3, "vbap_def_ls:   %ld-D configuration with %ld speakers", x->x_def_ls_dimension, x->x_def_ls_amount );
+  //logpost(NULL,3, "vbap_def_ls:   %ld-D configuration with %ld speakers", x->x_def_ls_dimension, x->x_def_ls_amount );
     
 	def_ls_bang(x); // calculate and send matrix to vbap
 }
@@ -213,9 +214,7 @@ static void initContent_ls_directions(t_def_ls *x,int ac,Atom*av)
 	
 	long d = 0;
 /*	if (av[0].a_type == A_LONG) d = av[0].a_w.w_long;
-	else */
-    
-    if(av[0].a_type == A_FLOAT) d = (long)av[0].a_w.w_float;
+	else */ if(av[0].a_type == A_FLOAT) d = (long)av[0].a_w.w_float;
 	else { error("define-loudspeakers: dimension NaN"); return; }
 
 	if (d==2 || d==3)
@@ -474,8 +473,6 @@ static void add_ldsp_triplet(int i, int j, int k, t_def_ls *x)
   }
   trip_ptr = (struct t_ls_set*) getbytes (sizeof (struct t_ls_set));
 
-    //post("add_ldsp_triplet getbytes:  %ld", sizeof (struct t_ls_set));
-    
   if(prev == NULL)
     x->x_ls_set = trip_ptr;
   else 
@@ -559,8 +556,7 @@ static int lines_intersect(int i,int j,int k,int l,t_ls  lss[MAX_LS_AMOUNT])
   //t_float angle;
   t_float dist_ij,dist_kl,dist_iv3,dist_jv3,dist_inv3,dist_jnv3;
   t_float dist_kv3,dist_lv3,dist_knv3,dist_lnv3;
-  // TODO epsilon needs to be updated for 64-bit/double precision
-  t_float epsilon = 1e-9;
+  t_float epsilon = FLT_EPSILON;
 
   ls_cross_prod(lss[i],lss[j],&v1);
   ls_cross_prod(lss[k],lss[l],&v2);
@@ -609,7 +605,6 @@ static void  calculate_3x3_matrixes(t_def_ls *x)
   struct t_ls_set *tr_ptr = x->x_ls_set;
   
   unsigned long triplet_amount = 0, /*ftable_size,*/i,pointer,list_length=0; 
-   
     
   Atom *at;
   t_ls *lss = x->x_ls;
@@ -629,7 +624,6 @@ static void  calculate_3x3_matrixes(t_def_ls *x)
   tr_ptr = x->x_ls_set;
   list_length= triplet_amount * 21 + 3;
   at= (Atom *) getbytes(list_length*sizeof(Atom));
-
 
   SETLONG(&at[0], x->x_def_ls_dimension);
   SETLONG(&at[1], x->x_def_ls_amount);
@@ -672,15 +666,13 @@ static void  calculate_3x3_matrixes(t_def_ls *x)
     SETFLOAT(&at[pointer], lp1->z); pointer++;
     SETFLOAT(&at[pointer], lp2->z); pointer++;
     SETFLOAT(&at[pointer], lp3->z); pointer++;
- 
-     
-      
+
     tr_ptr = tr_ptr->next;
   }
     
 	sendLoudspeakerMatrices(x,list_length, at);
     
-   freebytes(at, list_length*sizeof(Atom));
+  freebytes(at, list_length*sizeof(Atom));
 }
 
 
@@ -740,7 +732,6 @@ static void choose_ls_tuplets(t_def_ls *x)
   // Output
   list_length= amount * 10  + 2;
   at= (Atom *) getbytes(list_length*sizeof(Atom));
-    //post("choose_ls_tuplets getbytes:  %ld", list_length*sizeof(Atom));
 
   SETLONG(&at[0], x->x_def_ls_dimension);
   SETLONG(&at[1], x->x_def_ls_amount);
@@ -776,10 +767,8 @@ static void choose_ls_tuplets(t_def_ls *x)
     	pointer++;
     }
   }
-    //post("choose_ls_tuplets:  before call to sendLoudspeakerMatrices");
 
-    sendLoudspeakerMatrices(x,list_length, at);
-  //outlet_anything(x->x_outlet0, gensym("loudspeaker-matrices"), list_length, at);
+  sendLoudspeakerMatrices(x,list_length, at);
   freebytes(at, list_length*sizeof(Atom));
 }
 

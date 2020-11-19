@@ -92,14 +92,12 @@ void vbap_setup(void)
 	class_addmethod(vbap_class, (t_method)vbap_matrix, gensym("loudspeaker-matrices"), A_GIMME, 0);
 
 	// define_loudspeaker messages
-    class_addmethod(vbap_class, (t_method)vbap_def_ls, gensym("define-loudspeakers"), A_GIMME, 0);
-    class_addmethod(vbap_class, (t_method)vbap_def_ls, gensym("define_loudspeakers"), A_GIMME, 0);
-    class_addmethod(vbap_class, (t_method)def_ls_read_directions, gensym("ls-directions"), A_GIMME, 0);	
-    class_addmethod(vbap_class, (t_method)def_ls_read_triplets, gensym("ls-triplets"), A_GIMME, 0);
+  class_addmethod(vbap_class, (t_method)vbap_def_ls, gensym("define-loudspeakers"), A_GIMME, 0);
+  class_addmethod(vbap_class, (t_method)vbap_def_ls, gensym("define_loudspeakers"), A_GIMME, 0);
+  class_addmethod(vbap_class, (t_method)def_ls_read_directions, gensym("ls-directions"), A_GIMME, 0);	
+  class_addmethod(vbap_class, (t_method)def_ls_read_triplets, gensym("ls-triplets"), A_GIMME, 0);
 
-	logpost(NULL, 1, VBAP_VERSION);
-    //post(VBAP_VERSION);
-
+	post(VBAP_VERSION);
 }
 #else /* MAX */
 void main(void)
@@ -118,7 +116,7 @@ void main(void)
 	// define_loudspeaker messages
 	addmess((method)vbap_def_ls, "define-loudspeakers", A_GIMME, 0);
 	addmess((method)vbap_def_ls, "define_loudspeakers", A_GIMME, 0);
-	addmess((method)def_ls_read_directions, "ls-directions", A_GIMME, 0);	
+	addmess((method)def_ls_read_directions, "ls-directions", A_GIMME, 0);
 	addmess((method)def_ls_read_triplets, "ls-triplets", A_GIMME, 0);
 
 	addmess((method)vbap_assist,"assist",A_CANT,0);
@@ -156,13 +154,11 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
 	x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
 	x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
 	x->x_outlet3 = outlet_new(&x->x_obj, &s_float);
+  x->x_outlet4 = outlet_new(&x->x_obj, 0);
     
-    
-    
-    // allocate space for the runtime matricies
-//    if (!vbap_getmem(x, MAX_LS_SETS))
-//        return( NULL );
-//    
+  // allocate space for the runtime matricies
+//if(!vbap_getmem(x, MAX_LS_SETS))
+//    return NULL;
     
 #else /* Max */
 	t_vbap *x = (t_vbap *)newobject(vbap_class);
@@ -179,12 +175,13 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
 	x->x_outlet0 = listout(x);
 #endif /* PD */
 	
-    x->x_ls_setCount = 0;       // refers to memory dynamically allocated when a define_loudspeakers config is received
+  x->x_ls_setCount = 0;       // refers to memory dynamically allocated when a define_loudspeakers config is received
+  x->x_ls_set_current = 0;
 
-    x->x_spread_base[0] = 0.0;
+  x->x_spread_base[0] = 0.0;
 	x->x_spread_base[1] = 1.0;
 	x->x_spread_base[2] = 0.0;
-	x->x_lsset_available =0;
+	x->x_lsset_available = 0;
 
 	x->x_azi = azi;
 	x->x_ele = ele;
@@ -398,12 +395,18 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
     }
   }
   
+  // output new active loudspeaker set on a change
+  if(winner_set != x->x_ls_set_current){
+    t_atom floatValue;
+    SETFLOAT(&floatValue, winner_set);
+    outlet_anything(x->x_outlet4, gensym("current"), 1, &floatValue);
+    x->x_ls_set_current = winner_set;
+  }
+
   // If chosen set produced a negative value, make it zero and
   // calculate direction that corresponds  to these new
   // gain values. This happens when the virtual source is outside of
   // all loudspeaker sets. 
-  
-  //
   	gains_modified=0;
   	for(i=0;i<dim;i++)
   		if(g[i]<-0.01){
@@ -424,10 +427,8 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
  	 	} else new_cartdir[2] = 0;
  	 	cart_to_angle(new_cartdir,new_angle_dir);
  	 	x->x_azi = (new_angle_dir[0] );
-		//post("[vbap] use azimuth %g",x->x_azi );
  	 	x->x_ele = (new_angle_dir[1]);
  	 }
-  //}
   
   power=sqrt(g[0]*g[0] + g[1]*g[1] + g[2]*g[2]);
   g[0] /= power;
@@ -650,7 +651,12 @@ static void vbap_bang(t_vbap *x)
  
 	t_float *final_gs = (t_float *) getbytes(x->x_ls_amount * sizeof(t_float));
 
-	if(x->x_lsset_available ==1)
+  // avoid NaN explosions
+  if(x->x_spread < 0.00001f) {
+    x->x_spread = 0.0f;
+  }
+
+  if(x->x_lsset_available ==1)
 	{
 		vbap(g,ls, x);
 		for(i=0;i<x->x_ls_amount;i++)
@@ -658,7 +664,6 @@ static void vbap_bang(t_vbap *x)
 		for(i=0;i<x->x_dimension;i++)
 		{
 			final_gs[ls[i]-1]=g[i];
-            //post("VBAP: PRE_SPREAD: %f", (t_float)final_gs[i]);
 		}
 		if(x->x_spread != 0)
 		{
@@ -667,9 +672,7 @@ static void vbap_bang(t_vbap *x)
 		for(i=0;i<x->x_ls_amount;i++) 
 		{
 #ifdef PD
-            
-
-            SETFLOAT(&at[0], (t_float)i);
+      SETFLOAT(&at[0], (t_float)i);
 			SETFLOAT(&at[1], (t_float)final_gs[i]);
 			outlet_list(x->x_obj.ob_outlet, &s_list, 2, at);
 #else /* Max */
@@ -681,7 +684,6 @@ static void vbap_bang(t_vbap *x)
 		outlet_float(x->x_outlet1, x->x_azi); 
 		outlet_float(x->x_outlet2, x->x_ele); 
 		outlet_int(x->x_outlet3, x->x_spread); 
-		//outlet_int(x->x_outlet4, x->x_gain); 
 	}
 	else
 		error("vbap: Configure loudspeakers first!");
@@ -726,38 +728,31 @@ static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
 	}
 
 	long counter = (ac - 2) / ((x->x_dimension * x->x_dimension*2) + x->x_dimension);
-    
-    
  
-    if (counter-1 > MAX_LS_SETS) { error("vbap %s: loudspeaker definitions exceed maximum number of speakers",s->s_name); x->x_lsset_available=0; return; }
+  if (counter-1 > MAX_LS_SETS) { error("vbap %s: loudspeaker definitions exceed maximum number of speakers",s->s_name); x->x_lsset_available=0; return; }
 
-    vbap_getmem(x, counter);        // PD only:  allocate memory (frees any previously allocated memory automatically)
+  vbap_getmem(x, counter); // PD only:  allocate memory (frees any previously allocated memory automatically)
     
-    x->x_lsset_amount=counter;
-    
+  x->x_lsset_amount=counter;
 
  	if(counter==0) { error("vbap %s: not enough parameters",s->s_name); x->x_lsset_available=0; return; }
  	
 	long setpointer=0;
 	long i;
     
-    long db_dim = x->x_dimension;
-    
-    while(counter-- > 0)
+  long db_dim = x->x_dimension;
+  
+  while(counter-- > 0)
 	{
  
-        for(i=0; i < x->x_dimension; i++)
+    for(i=0; i < x->x_dimension; i++)
 		{
 # ifdef PD
-            
-            if(av[datapointer].a_type == A_FLOAT)
+      if(av[datapointer].a_type == A_FLOAT)
 			{
-                x->x_lsset[setpointer][i]=(long)av[datapointer++].a_w.w_float;
-  			}
- 			else { error("vbap AA %s: param %d is not a float",s->s_name,datapointer); x->x_lsset_available=0; return; }
-
-            
-            
+        x->x_lsset[setpointer][i]=(long)av[datapointer++].a_w.w_float;
+  		}
+ 			else { error("vbap %s: param %d is not a float",s->s_name,datapointer); x->x_lsset_available=0; return; }
 # else /* Max */
  			if(av[datapointer].a_type == A_LONG)
 			{
@@ -767,32 +762,36 @@ static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
 # endif /* PD */
  		}	
 
- 		
-        for(i=0; i < x->x_dimension*x->x_dimension; i++)
+    for(i=0; i < x->x_dimension*x->x_dimension; i++)
 		{
-
-            if(av[datapointer].a_type == A_FLOAT)
+      if(av[datapointer].a_type == A_FLOAT)
 			{
  				x->x_set_inv_matx[setpointer][i]=av[datapointer++].a_w.w_float;
  			}
  			else { error("vbap BB %s: param %d is not a float",s->s_name,datapointer); x->x_lsset_available=0; return; }
  		}
- 		
 
  		for(i=0; i < x->x_dimension*x->x_dimension; i++)
 		{
-            
-            
  			if(av[datapointer].a_type == A_FLOAT)
 			{
  				x->x_set_matx[setpointer][i]=av[datapointer++].a_w.w_float;
  			}
  			else {
-                error("vbap %s: param %d is not a float",s->s_name,datapointer); x->x_lsset_available=0;
-                 return;
-            }
- 			
+        error("vbap %s: param %d is not a float",s->s_name,datapointer); x->x_lsset_available=0;
+        return;
+      }
  		}
+
+    // output defined loudspeaker sets for this setup
+    t_atom atoms[4];
+    SETFLOAT(&atoms[0], setpointer);
+    SETFLOAT(&atoms[1], x->x_lsset[setpointer][0]);
+    SETFLOAT(&atoms[2], x->x_lsset[setpointer][1]);
+    if(x->x_dimension==3){
+      SETFLOAT(&atoms[3], x->x_lsset[setpointer][2]);
+    }
+    outlet_anything(x->x_outlet4, gensym("set"), x->x_dimension, atoms);
 	
  		setpointer++;
 	}

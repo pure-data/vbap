@@ -28,24 +28,21 @@
 #define MAX_LS_AMOUNT 55    // maximum amount of loudspeakers, can be increased, but see comments next to MAX_LS_SETS above
 #define MIN_VOL_P_SIDE_LGTH 0.01  
 
-#define VBAP_VERSION "vbap - v1.1 - 14 Aug. 2014 - (c) Ville Pulkki 1999-2006 (Pd port by HCS)"
-#define DFLS_VERSION "define_loudspeakers - v1.0.3.2 - 20 Nov 2010 - (c) Ville Pulkki 1999-2006"
+#define VBAP_VERSION "vbap v1.2 - 17 Jul 2018 - (c) Ville Pulkki 1999-2006 (Pd port by HCS)"
+#define DFLS_VERSION "define_loudspeakers v1.2 - 17 July 2018 - (c) Ville Pulkki 1999-2006"
 
-static t_float rad2ang = 360.0 / ( 2.0f * M_PI );
-static t_float atorad = (2.0f * M_PI) / 360.0f ;
+static t_float rad2ang = 360.0 / (2.0f * M_PI);
+static t_float atorad = (2.0f * M_PI) / 360.0f;
 
 #ifdef VBAP_OBJECT
-
-//We are inside vbap object, so sending matrix from define_loudspeakers is a simple call to the vbap receiver...
-
-#define sendLoudspeakerMatrices(x,list_length, at) \
- 					vbap_matrix(x, gensym("loudspeaker-matrices"),list_length, at); \
- 					vbap_bang(x)
-
-#else
-	// We are inside define_loudspeaker object, send matrix to outlet
+	// inside vbap object, so sending matrix from define_loudspeakers is a simple call to the vbap receiver...
 	#define sendLoudspeakerMatrices(x,list_length, at) \
-					outlet_anything(x->x_outlet0, gensym("loudspeaker-matrices"), list_length, at);
+ 				vbap_matrix(x, gensym("loudspeaker-matrices"),list_length, at); \
+ 				vbap_bang(x)
+#else
+	// inside define_loudspeaker object, send matrix to outlet
+	#define sendLoudspeakerMatrices(x,list_length, at) \
+			outlet_anything(x->x_outlet0, gensym("loudspeaker-matrices"), list_length, at);
 #endif
 
 
@@ -114,7 +111,8 @@ typedef struct t_ls_set
 		t_ls_set *x_ls_set;					// loudspeaker sets
 		long x_def_ls_amount;				// number of loudspeakers
 		long x_def_ls_dimension;		// 2 (horizontal arrays) or 3 (3d setups)
-        long x_ls_setCount;       // the number of Loudspeaker sets used for an instance's current loudspeaker configuration
+        long x_ls_setCount;       // the number of loudspeaker sets used for an instance's current loudspeaker configuration
+        long x_ls_set_current;    // current active loudspeaker set
 	} t_vbap;
 
 	// define loudspeaker data type...
