@@ -1,8 +1,8 @@
-/* rvbap.c vers 1.1 
+/* rvbap.c vers 1.1
 
 written by Ville Pulkki 1999-2003
-Helsinki University of Technology 
-and 
+Helsinki University of Technology
+and
 Unversity of California at Berkeley
 
 and written by Olaf Matthes 2003, 2007
@@ -18,7 +18,7 @@ See copyright in file with name LICENSE.txt */
 #define pd_error(x, ...) post(__VA_ARGS__)
 #endif
 
-#ifdef PD 
+#ifdef PD
 #include "m_pd.h"
 #endif
 
@@ -290,11 +290,11 @@ static void vbap(t_float g[3], long ls[3], t_rvbap *x)
   // positive values. If such is not found, set with largest minimum value is
   // chosen. If at least one of gain factors of one ls set is negative it means
   // that the virtual source does not lie in that ls set.
-  
+
   angle_to_cart(x->x_azi, x->x_ele, cartdir);
   big_sm_g = -100000.0; // initial value for largest minimum gain value
   best_neg_g_am = 3;    // how many negative values in this set
-  
+
   for (i = 0; i < x->x_lsset_amount; i++)
   {
     small_g = 10000000.0;
@@ -312,7 +312,7 @@ static void vbap(t_float g[3], long ls[3], t_rvbap *x)
     if (small_g > big_sm_g && neg_g_am <= best_neg_g_am)
     {
       big_sm_g = small_g;
-      best_neg_g_am = neg_g_am; 
+      best_neg_g_am = neg_g_am;
       winner_set = i;
       g[0] = gtmp[0]; g[1] = gtmp[1];
       ls[0] = x->x_lsset[i][0]; ls[1] = x->x_lsset[i][1];
@@ -542,7 +542,7 @@ static void spread_it(t_rvbap *x, t_float *final_gs)
       spreadbase[6][i] = (spreadbase[2][i] + spreadbase[3][i]) / 2.0;
     for (i = 0; i < 3; i++)
       spreadbase[7][i] = (spreadbase[3][i] + x->x_spread_base[i]) / 2.0;
-    
+
     // four at half spreadangle
     for (i = 0; i < 3; i++)
       spreadbase[8][i] = (vscartdir[i] + x->x_spread_base[i]) / 2.0;
@@ -552,7 +552,7 @@ static void spread_it(t_rvbap *x, t_float *final_gs)
       spreadbase[10][i] = (vscartdir[i] + spreadbase[2][i]) / 2.0;
     for (i = 0; i < 3; i++)
       spreadbase[11][i] = (vscartdir[i] + spreadbase[3][i]) / 2.0;
-    
+
     // four at quarter spreadangle
     for (i = 0; i < 3; i++)
       spreadbase[12][i] = (vscartdir[i] + spreadbase[8][i]) / 2.0;
@@ -580,7 +580,7 @@ static void spread_it(t_rvbap *x, t_float *final_gs)
     angle_to_cart(x->x_azi + x->x_spread/4, 0, spreaddir[3]);
     angle_to_cart(x->x_azi + x->x_spread/2, 0, spreaddir[4]);
     angle_to_cart(x->x_azi + x->x_spread,   0, spreaddir[5]);
-    
+
     for (i = 0; i < spreaddirnum; i++)
       additive_vbap(final_gs, spreaddir[i], x);
   }
@@ -623,7 +623,7 @@ static void equal_reverb(t_rvbap *x, t_float *final_gs)
     // above, below
     angle_to_cart(0,  90, spreaddir[3]);
     angle_to_cart(0, -90, spreaddir[4]);
-    
+
     for (i = 1; i < spreaddirnum; i++)
       additive_vbap(x->x_reverb_gs,spreaddir[i], x);
   }
@@ -741,7 +741,7 @@ static void rvbap_matrix(t_rvbap *x, t_symbol *s, int ac, t_atom *av)
   long azi = x->x_azi, ele = x->x_ele; // store original values
   t_float g[3];
   long ls[3];
- 
+
   if (ac > 0)
   {
 #ifdef MAXMSP
@@ -783,7 +783,7 @@ static void rvbap_matrix(t_rvbap *x, t_symbol *s, int ac, t_atom *av)
   }
   else
     x->x_lsset_available = 0;
- 
+
   if (x->x_dimension == 3)
     counter = (ac - 2) / ((x->x_dimension * x->x_dimension*2) + x->x_dimension);
   if (x->x_dimension == 2)

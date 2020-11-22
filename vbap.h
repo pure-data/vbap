@@ -43,7 +43,7 @@
 
 #define MATRIX_DIM 9      //< hard-coded matrix dimension for the algorithm
 #define SPEAKER_SET_DIM 3 //< hard-coded speaker set dimension for the algorithm
-#define MIN_VOL_P_SIDE_LGTH 0.01  
+#define MIN_VOL_P_SIDE_LGTH 0.01
 
 #define VBAP_VERSION \
   "vbap v1.2.0 - 17 Jul 2018 - (c) Ville Pulkki 1999-2006 (Pd port by HCS)"
@@ -67,7 +67,7 @@ static t_float atorad = (2.0f * M_PI) / 360.0f;
 #endif
 
 /// loudspeaker instance, distance value is 1.0 == unit vectors
-typedef struct 
+typedef struct
 {
   t_float x;       //< cartesian x coordinate
   t_float y;       //< cartesian y coordinate
@@ -78,7 +78,7 @@ typedef struct
 } t_ls;
 
 /// all loudspeaker sets
-typedef struct t_ls_set 
+typedef struct t_ls_set
 {
   int ls_nos[3];         //< channel numbers
   t_float inv_mx[9];     //< inverse 3x3 or 2x2 matrix
@@ -104,7 +104,7 @@ typedef struct t_ls_set
 
 #ifdef PD
     // memory for data sets is now allocated dynamically in each instance
-    
+
     t_float **x_set_inv_matx; //< inverse matrice for each loudspeaker set
     t_float **x_set_matx;     //< matrice for each loudspeaker set
     long **x_lsset;           //< channel numbers of loudspeakers in each ls set

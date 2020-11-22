@@ -1,8 +1,8 @@
 /* define_loudspeakers.c 1.00b1----> x-max4.2
 
 written by Ville Pulkki 1999-2003
-Helsinki University of Technology 
-and 
+Helsinki University of Technology
+and
 Unversity of California at Berkeley
 
 See copyright in file with name LICENSE.txt */
@@ -197,7 +197,7 @@ void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 
   // logpost(NULL, 3, "vbap_def_ls: %ld-D configuration with %ld speakers",
   //   x->x_def_ls_dimension, x->x_def_ls_amount);
-    
+
   def_ls_bang(x); // calculate and send matrix to vbap
 }
 
@@ -306,7 +306,7 @@ static void choose_ls_triplets(t_def_ls *x)
     pd_error(x, "define-loudspeakers: number of loudspeakers is zero");
     return;
   }
- 
+
   for (i = 0; i < ls_amount; i++)
   {
     for (j = i+1; j < ls_amount; j++)
@@ -328,7 +328,7 @@ static void choose_ls_triplets(t_def_ls *x)
   }
 
   // calculate distancies between all lss and sorting them
-  table_size = ((ls_amount - 1) * (ls_amount)) / 2; 
+  table_size = ((ls_amount - 1) * (ls_amount)) / 2;
   for (i = 0; i < table_size; i++)
     distance_table[i] = 100000.0;
   for (i = 0; i < ls_amount; i++)
@@ -349,7 +349,7 @@ static void choose_ls_triplets(t_def_ls *x)
         distance_table[k] = distance;
         distance_table_i[k] = i;
         distance_table_j[k] = j;
-      } 
+      }
       else
         table_size--;
     }
@@ -395,13 +395,13 @@ static void choose_ls_triplets(t_def_ls *x)
         connections[j][k] == 0 ||
         any_ls_inside_triplet(i, j, k, x->x_ls, ls_amount) == 1)
     {
-      if(prev != NULL) 
+      if(prev != NULL)
       {
         prev->next = trip_ptr->next;
         tmp_ptr = trip_ptr;
         trip_ptr = trip_ptr->next;
         freebytes(tmp_ptr, sizeof(struct t_ls_set));
-      } 
+      }
       else
       {
         x->x_ls_set = trip_ptr->next;
@@ -409,7 +409,7 @@ static void choose_ls_triplets(t_def_ls *x)
         trip_ptr = trip_ptr->next;
         freebytes(tmp_ptr, sizeof(struct t_ls_set));
       }
-    } 
+    }
     else
     {
       prev = trip_ptr;
@@ -594,7 +594,7 @@ static int lines_intersect(int i,int j, int k, int l, t_ls lss[MAX_LS_AMOUNT])
 
 // calculates the inverse matrices for 3D
 static void calculate_3x3_matrixes(t_def_ls *x)
-{  
+{
   t_float invdet;
   t_ls *lp1, *lp2, *lp3;
   t_float *invmx;
@@ -602,7 +602,7 @@ static void calculate_3x3_matrixes(t_def_ls *x)
   unsigned long triplet_amount = 0, i, pointer, list_length = 0;
   Atom *at;
   t_ls *lss = x->x_ls;
-  
+
   if (tr_ptr == NULL)
   {
     pd_error(x, "define-loudspeakers: not valid 3-D configuration");
@@ -622,7 +622,7 @@ static void calculate_3x3_matrixes(t_def_ls *x)
   SETLONG(&at[0], x->x_def_ls_dimension);
   SETLONG(&at[1], x->x_def_ls_amount);
   pointer = 2;
-  
+
   while(tr_ptr != NULL)
   {
     lp1 = &(lss[tr_ptr->ls_nos[0]]);
@@ -666,9 +666,9 @@ static void calculate_3x3_matrixes(t_def_ls *x)
 
     tr_ptr = tr_ptr->next;
   }
-    
+
   sendLoudspeakerMatrices(x, list_length, at);
-    
+
   freebytes(at, list_length * sizeof(Atom));
 }
 
@@ -678,7 +678,7 @@ static void choose_ls_tuplets(t_def_ls *x)
 {
   int i, j;
   int sorted_lss[MAX_LS_AMOUNT];
-  int exist[MAX_LS_AMOUNT];   
+  int exist[MAX_LS_AMOUNT];
   int amount = 0;
   t_float inv_mat[MAX_LS_AMOUNT][4]; // in 2D num ls == max amount of ls pairs
   t_float mat[MAX_LS_AMOUNT][4];
@@ -687,7 +687,7 @@ static void choose_ls_tuplets(t_def_ls *x)
   long list_length;
   Atom *at;
   long pointer;
-  
+
   for (i = 0; i < MAX_LS_AMOUNT; i++)
     exist[i] = 0;
 
@@ -711,13 +711,13 @@ static void choose_ls_tuplets(t_def_ls *x)
 
   if ((360 - lss[sorted_lss[ls_amount-1]].azi + lss[sorted_lss[0]].azi) <= 170)
   {
-    if(calc_2D_inv_tmatrix(lss[sorted_lss[ls_amount-1]].azi, 
-                           lss[sorted_lss[0]].azi, 
+    if(calc_2D_inv_tmatrix(lss[sorted_lss[ls_amount-1]].azi,
+                           lss[sorted_lss[0]].azi,
                            inv_mat[ls_amount-1], mat[ls_amount-1]) != 0)
     {
         exist[ls_amount-1] = 1;
         amount++;
-    } 
+    }
   }
 
   // output
@@ -727,7 +727,7 @@ static void choose_ls_tuplets(t_def_ls *x)
   SETLONG(&at[0], x->x_def_ls_dimension);
   SETLONG(&at[1], x->x_def_ls_amount);
   pointer = 2;
-  
+
   for (i = 0; i < ls_amount - 1; i++)
   {
     if(exist[i] == 1) {
@@ -809,14 +809,14 @@ void sort_2D_lss(t_ls lss[MAX_LS_AMOUNT],
     lss[i].azi = (tmp_azi - (t_float)4000.0);
   }
 }
-  
+
 // calculate inverse 2x2 matrix
 static int calc_2D_inv_tmatrix(t_float azi1, t_float azi2,
   t_float inv_mat[4], t_float mat[4])
 {
   t_float x1, x2, x3, x4;
   t_float det;
-  
+
   mat[0] = x1 = cos(azi1 / rad2ang);
   mat[1] = x2 = sin(azi1 / rad2ang);
   mat[2] = x3 = cos(azi2 / rad2ang);

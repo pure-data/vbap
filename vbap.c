@@ -1,9 +1,9 @@
-/* vbap.c 
+/* vbap.c
 
 written by Ville Pulkki 1999-2003
-Helsinki University of Technology 
-and 
-University of California at Berkeley 
+Helsinki University of Technology
+and
+University of California at Berkeley
 
 See copyright in file with name LICENSE.txt */
 
@@ -145,7 +145,7 @@ void vbap_ft4(t_vbap *x, double g) { x->x_gain = g; }
 #endif // MAX
 
 /*----------------------------------------------------------------------------*/
-// create new instance of object... 
+// create new instance of object...
 static void *vbap_new(t_float azi, t_float ele, t_float spread)
 {
 #ifdef PD
@@ -160,11 +160,11 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
   x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
   x->x_outlet3 = outlet_new(&x->x_obj, &s_float);
   x->x_outlet4 = outlet_new(&x->x_obj, 0);
-    
+
   // allocate space for the runtime matricies
 //if (!vbap_getmem(x, MAX_LS_SETS))
 //  return NULL;
-    
+
 #else // MAX
   t_vbap *x = (t_vbap *)newobject(vbap_class);
 
@@ -305,7 +305,7 @@ static void vbap_free(t_vbap *x)
 
 // converts angular (polar) coordinates to cartesian
 static void angle_to_cart(t_float azi, t_float ele, t_float res[3])
-{ 
+{
   res[0] = cos(azi * atorad) * cos(ele * atorad);
   res[1] = sin(azi * atorad) * cos(ele * atorad);
   res[2] = sin(ele * atorad);
@@ -316,7 +316,7 @@ static void cart_to_angle(t_float cvec[3], t_float avec[3])
 {
   t_float dist, atan_y_per_x, atan_x_pl_y_per_z;
   t_float azi, ele;
-  
+
   if (cvec[0] == 0.0)
     atan_y_per_x = M_PI / 2;
   else
@@ -382,11 +382,11 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
   // positive values. If such is not found, set with largest minimum value is
   // chosen. If at least one of gain factors of one LS set is negative it means
   // that the virtual source does not lie in that LS set.
-  
+
   angle_to_cart(x->x_azi, x->x_ele, cartdir);
   big_sm_g = -100000.0; // initial value for largest minimum gain value
   best_neg_g_am = 3;    // how many negative values in this set
-  
+
   for (i = 0; i < x->x_lsset_amount; i++)
   {
     small_g = 10000000.0;
@@ -404,7 +404,7 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
     if (small_g > big_sm_g && neg_g_am <= best_neg_g_am)
     {
       big_sm_g = small_g;
-      best_neg_g_am = neg_g_am; 
+      best_neg_g_am = neg_g_am;
       winner_set = i;
       g[0] = gtmp[0]; g[1] = gtmp[1];
       ls[0] = x->x_lsset[i][0]; ls[1]= x->x_lsset[i][1];
@@ -412,7 +412,7 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
       {
         g[2] = gtmp[2];
         ls[2] = x->x_lsset[i][2];
-      } 
+      }
       else
       {
         g[2] = 0.0;
@@ -420,7 +420,7 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
       }
     }
   }
-  
+
   // output new active loudspeaker set on a change
   if (winner_set != x->x_ls_set_current) {
     t_atom floatValue;
@@ -468,7 +468,7 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x)
 }
 
 // vector cross product
-static void vect_cross_prod(t_float v1[3], t_float v2[3], t_float v3[3])  
+static void vect_cross_prod(t_float v1[3], t_float v2[3], t_float v3[3])
 {
   t_float length;
   v3[0] = (v1[1] * v2[2]) - (v1[2] * v2[1]);
@@ -494,7 +494,7 @@ static void additive_vbap(t_float *final_gs, t_float cartdir[3], t_vbap *x)
   long neg_g_am, best_neg_g_am;
   t_float g[3] = {0, 0, 0};
   long ls[3] = {0, 0, 0};
-  
+
   big_sm_g = -100000.0;
   best_neg_g_am = 3;
 
@@ -705,7 +705,7 @@ static void vbap_bang(t_vbap *x)
   t_float g[3];
   long ls[3];
   long i;
- 
+
   t_float *final_gs = (t_float *)getbytes(x->x_ls_amount * sizeof(t_float));
 
   // avoid NaN explosions, TODO: should this use FLT_EPSILON?
@@ -813,7 +813,7 @@ static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
 
   // PD only: alloc memory (frees any previously allocated memory automatically)
   vbap_getmem(x, counter);
-    
+
   x->x_lsset_amount = counter;
   if (counter == 0)
   {
@@ -821,7 +821,7 @@ static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
     x->x_lsset_available = 0;
     return;
   }
-  
+
   long i, setpointer = 0;
   while (counter-- > 0)
   {
