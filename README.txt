@@ -8,6 +8,16 @@ Laboratory of Acoustics and Audio Signal Processing
 
 http://www.acoustics.hut.fi/research/cat/vbap/
 
+Algorithm and Max object
+1998-2010 Ville Pulkki  
+2002, Juha Vehviläinen  
+2003, Olaf Matthes  
+
+Pure Data port
+2006-2010, Hans-Christoph Steiner  
+2007, Frank Barknecht  
+2020, Dan Wilcox  
+
 ## Description
 
 This is a library for Pure Data for sound spatialization using the vector base

@@ -24,9 +24,6 @@
 #define newobject(class)            pd_new(class)
 #define outlet_int(outlet, number)  outlet_float(outlet, number)
 
-/* debug things */
-#define _enable_trace sys_verbose
-
 /* these are NOT included here because they would cause more problems than
  * they would solve.  Usually, they are used in the setup() and new()
  * functions, where most of the differences are between the Max and PD APIs */
