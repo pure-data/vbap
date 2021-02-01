@@ -198,3 +198,4 @@ typedef struct t_ls_set
 #endif // VBAP_OBJECT
 
 
+void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, t_atom *av);
