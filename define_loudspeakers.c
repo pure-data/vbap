@@ -262,7 +262,7 @@ static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av)
   int i, pointer = 1;
   long d = -1;
 
-  if(ac<1 && !(vbap_atom2long(av, &d)))
+  if(!(ac>0 && vbap_atom2long(av, &d)))
   {
     pd_error(x, "define-loudspeakers: dimension NaN");
     return;
