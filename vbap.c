@@ -145,8 +145,8 @@ void vbap_ft4(t_vbap *x, double g) { x->x_gain = g; }
 // create new instance of object...
 static void *vbap_new(t_float azi, t_float ele, t_float spread)
 {
-#ifdef PD
   t_vbap *x = (t_vbap *)newobject(vbap_class);
+#ifdef PD
 
   floatinlet_new(&x->x_obj, &x->x_azi);
   floatinlet_new(&x->x_obj, &x->x_ele);
@@ -163,7 +163,6 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
 //  return NULL;
 
 #else // MAX
-  t_vbap *x = (t_vbap *)newobject(vbap_class);
 
   floatin(x, 4);
   floatin(x, 3);
@@ -742,19 +741,13 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
   if (ac > 0)
   {
     int d = 0;
-#ifndef PD // MAX
-    if (av[datapointer].a_type == A_LONG)
-      d = av[datapointer++].a_w.w_long;
-    else
-#endif
-    if (av[datapointer].a_type == A_FLOAT)
-      d = (long)av[datapointer++].a_w.w_float;
-    else
+    if(!(ac>0 && vbap_atom2long(av+datapointer, &d)))
     {
       pd_error(x, "vbap: dimension NaN");
       x->x_lsset_available = 0;
       return;
     }
+    datapointer++;
 
     if (d != 2 && d != 3)
     {
@@ -776,19 +769,13 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
   if (ac > 1)
   {
     long a = 0;
-#ifndef PD // MAX
-    if (av[datapointer].a_type == A_LONG)
-      a = av[datapointer++].a_w.w_long;
-    else
-#endif
-    if (av[datapointer].a_type == A_FLOAT)
-      a = (long) av[datapointer++].a_w.w_float;
-    else
+    if(!(vbap_atom2long(av, av+datapointer)))
     {
       pd_error(x, "vbap: loudspeaker set amount NaN");
       x->x_lsset_available = 0;
       return;
     }
+    datapointer++;
     x->x_ls_amount = a;
   }
 
@@ -818,21 +805,11 @@ static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
   {
     for (i = 0; i < x->x_dimension; i++)
     {
-#ifndef PD // MAX
-      if (av[datapointer].a_type == A_LONG)
-         x->x_lsset[setpointer][i] = av[datapointer++].a_w.w_long;
-      else
-      {
-        pd_error(x, "vbap %s: param %d is not an int", s->s_name, datapointer);
-        x->x_lsset_available = 0;
-        return;
-      }
-#endif
-      if (av[datapointer].a_type == A_FLOAT)
-        x->x_lsset[setpointer][i] = (long)av[datapointer++].a_w.w_float;
-      else
-      {
-        pd_error(x, "vbap %s: param %d is not a float", s->s_name, datapointer);
+      long d;
+      if(vbap_atom2long(av+datapointer, &d)) {
+        x->x_lsset[setpointer][i] = d;
+      } else {
+        pd_error(x, "vbap %s: param %d is not a number", s->s_name, datapointer);
         x->x_lsset_available = 0;
         return;
       }
