@@ -17,6 +17,21 @@
 # define newobject(class)            pd_new(class)
 # define outlet_int(outlet, number)  outlet_float(outlet, number)
 
+static int vbap_atom2long(t_atom*a, long*target) {
+  if(a->a_type == A_FLOAT) {
+    *target = (long)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+static int vbap_atom2float(t_atom*a, t_float*target) {
+  if(a->a_type == A_FLOAT) {
+    *target = (t_float)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+
 # else // MAX
 
 /* name changes */
@@ -30,6 +45,30 @@ void traces(t_def_ls *x, long n) { _enable_trace = n ? true : false;}
 
 /// pd_error -> post
 # define pd_error(x, ...) post(__VA_ARGS__)
+
+/* get atom's A_LONG value, failing that it's A_FLOAT value and else fall back to default_value */
+static int vbap_atom2long(t_atom*a, long*target) {
+  if(a->a_type == A_LONG) {
+    *target = a->a_w.w_long;
+    return 1;
+  }
+  if(a->a_type == A_FLOAT) {
+    *target = (long)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+static int vbap_atom2float(t_atom*a, t_float*target) {
+  if(a->a_type == A_LONG) {
+    *target = a->a_w.w_long;
+    return 1;
+  }
+  if(a->a_type == A_FLOAT) {
+    *target = (t_float)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
 
 #endif // PD vs MAX
 

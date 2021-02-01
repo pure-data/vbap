@@ -35,27 +35,12 @@ static void sort_2D_lss(t_ls lss[MAX_LS_AMOUNT],
 static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av);
 
 
-#ifdef PD
+#ifndef VBAP_OBJECT
+# ifdef PD
 /* get atom's A_LONG value, failing that it's A_FLOAT, and write it into target and return 1 (true).
    if the atom is neither A_LONG nor A_FLOAT, 0 (false) is returned.
 */
-static int vbap_atom2long(t_atom*a, long*target) {
-  if(a->a_type == A_FLOAT) {
-    *target = (long)a->a_w.w_float;
-    return 1;
-  }
-  return 0;
-}
-static int vbap_atom2float(t_atom*a, t_float*target) {
-  if(a->a_type == A_FLOAT) {
-    *target = (t_float)a->a_w.w_float;
-    return 1;
-  }
-  return 0;
-}
 
-
-# ifndef VBAP_OBJECT
 // if we are within vbap (which includes define_loudspeakers),
 // then don't create a main for define_loudspeakers
 void define_loudspeakers_setup(void)
@@ -71,35 +56,8 @@ void define_loudspeakers_setup(void)
 
   post(DFLS_VERSION);
 }
-# endif
-#else // MAX
+# else // MAX
 
-
-/* get atom's A_LONG value, failing that it's A_FLOAT value and else fall back to default_value */
-static int vbap_atom2long(t_atom*a, long*target) {
-  if(a->a_type == A_LONG) {
-    *target = a->a_w.w_long;
-    return 1;
-  }
-  if(a->a_type == A_FLOAT) {
-    *target = (long)a->a_w.w_float;
-    return 1;
-  }
-  return 0;
-}
-static int vbap_atom2float(t_atom*a, t_float*target) {
-  if(a->a_type == A_LONG) {
-    *target = a->a_w.w_long;
-    return 1;
-  }
-  if(a->a_type == A_FLOAT) {
-    *target = (t_float)a->a_w.w_float;
-    return 1;
-  }
-  return 0;
-}
-
-# ifndef VBAP_OBJECT
 void main(void)
 {
   setup((t_messlist **)&def_ls_class, (method)def_ls_new, 0L,
@@ -112,8 +70,8 @@ void main(void)
 
   post(DFLS_VERSION);
 }
-# endif // !VBAP_OBJECT
-#endif // PD vs MAX
+# endif // PD vs MAX
+#endif // !VBAP_OBJECT
 
 // calculate and print out chosen loudspeaker sets and corresponding matrices
 static void def_ls_bang(t_def_ls *x)
