@@ -11,6 +11,27 @@ See copyright in file with name LICENSE.txt */
 #include <float.h>
 
 #ifdef PD
+
+
+/* get atom's A_LONG value, failing that it's A_FLOAT, and write it into target and return 1 (true).
+   if the atom is neither A_LONG nor A_FLOAT, 0 (false) is returned.
+*/
+static int vbap_atom2long(t_atom*a, long*target) {
+  if(a->a_type == A_FLOAT) {
+    *target = (long)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+static int vbap_atom2float(t_atom*a, t_float*target) {
+  if(a->a_type == A_FLOAT) {
+    *target = (t_float)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+
+
 # ifndef VBAP_OBJECT
 // if we are within vbap (which includes define_loudspeakers),
 // then don't create a main for define_loudspeakers
@@ -29,6 +50,32 @@ void define_loudspeakers_setup(void)
 }
 # endif
 #else // MAX
+
+
+/* get atom's A_LONG value, failing that it's A_FLOAT value and else fall back to default_value */
+static int vbap_atom2long(t_atom*a, long*target) {
+  if(a->a_type == A_LONG) {
+    *target = a->a_w.w_long;
+    return 1;
+  }
+  if(a->a_type == A_FLOAT) {
+    *target = (long)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+static int vbap_atom2float(t_atom*a, t_float*target) {
+  if(a->a_type == A_LONG) {
+    *target = a->a_w.w_long;
+    return 1;
+  }
+  if(a->a_type == A_FLOAT) {
+    *target = (t_float)a->a_w.w_float;
+    return 1;
+  }
+  return 0;
+}
+
 # ifndef VBAP_OBJECT
 void main(void)
 {
@@ -112,30 +159,9 @@ static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
   for (i = 0; i < ac; i += 3)
   {
     long l1 = 0, l2 = 0, l3 = 0;
-
-#ifndef PD // MAX
-  if(av[i].a_type == A_LONG)
-    l1 = av[i].a_w.w_long;
-  else
-#endif
-  if(av[i].a_type == A_FLOAT)
-    l1 = (long)av[i].a_w.w_float;
-
-#ifndef PD // MAX
-  if(av[i+1].a_type == A_LONG)
-    l2 = av[i+1].a_w.w_long;
-  else
-#endif
-  if(av[i+1].a_type == A_FLOAT)
-    l2 = (long)av[i+1].a_w.w_float;
-
-#ifndef PD // MAX
-  if(av[i+2].a_type == A_LONG)
-    l3 = av[i+2].a_w.w_long;
-  else
-#endif
-  if(av[i+2].a_type == A_FLOAT)
-    l3 = (long)av[i+2].a_w.w_float;
+    vbap_atom2long(av+i+0, &l1);
+    vbap_atom2long(av+i+1, &l2);
+    vbap_atom2long(av+i+2, &l3);
 
     add_ldsp_triplet(l1-1, l2-1, l3-1, x);
   }
@@ -209,14 +235,9 @@ static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av)
 {
   x->x_ls_read = 0;
   int i, pointer = 1;
-  long d = 0;
+  long d = -1;
 
-#ifndef PD // MAX
-  if (av[0].a_type == A_LONG) d = av[0].a_w.w_long;
-  else
-#endif
-  if (av[0].a_type == A_FLOAT) d = (long)av[0].a_w.w_float;
-  else
+  if(ac<1 && !(vbap_atom2long(av, &d)))
   {
     pd_error(x, "define-loudspeakers: dimension NaN");
     return;
@@ -241,12 +262,7 @@ static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av)
   {
     t_float azi = 0, ele = 0; // in 2d elevation is zero
 
-#ifndef PD // MAX
-    if (av[pointer].a_type == A_LONG) azi = (float)av[pointer].a_w.w_long;
-    else
-#endif
-    if (av[pointer].a_type == A_FLOAT) azi = av[pointer].a_w.w_float;
-    else
+    if(!vbap_atom2float(av+pointer, &azi))
     {
       pd_error(x, "define-loudspeakers: direction angle #%d NaN", i+1);
       x->x_ls_read = 0;
@@ -256,12 +272,7 @@ static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av)
     pointer++;
     if (x->x_def_ls_dimension == 3) // 3D
     {
-#ifndef PD // MAX
-      if (av[pointer].a_type == A_LONG) ele = (float)av[pointer].a_w.w_long;
-      else
-#endif
-      if (av[pointer].a_type == A_FLOAT) ele = av[pointer].a_w.w_float;
-      else
+    if(!vbap_atom2float(av+pointer, &ele))
       {
         pd_error(x, "define-loudspeakers: elevation #%d NaN", i+1);
         x->x_ls_read = 0;
