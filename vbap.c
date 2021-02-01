@@ -24,7 +24,7 @@ static void additive_vbap(t_float *final_gs, t_float cartdir[3], t_vbap *x);
 static void vbap_bang(t_vbap *x);
 static int vbap_getmem(t_vbap *x, int lsSetCount );
 static void vbap_free(t_vbap *x);
-static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av);
+static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av);
 #ifndef PD // MAX
 // these are for getting data from a cold inlet on Max MSP,
 // in Pd you use t_floatinlet_new() in new()
@@ -699,7 +699,7 @@ static void spread_it(t_vbap *x, t_float *final_gs)
 // top level, vbap gains are calculated and outputted
 static void vbap_bang(t_vbap *x)
 {
-  Atom at[MAX_LS_AMOUNT];
+  t_atom at[MAX_LS_AMOUNT];
   t_float g[3];
   long ls[3];
   long i;
@@ -743,7 +743,7 @@ static void vbap_bang(t_vbap *x)
 }
 
 // read in loudspeaker matrices
-static void vbap_matrix(t_vbap *x, Symbol *s, int ac, Atom *av)
+static void vbap_matrix(t_vbap *x, t_symbol *s, int ac, t_atom *av)
 {
   int datapointer = 0;
   if (ac > 0)

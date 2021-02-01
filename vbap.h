@@ -167,6 +167,8 @@ typedef struct t_ls_set
 #endif // VBAP_OBJECT
 
 #ifndef PD // MAX
+typedef Atom t_atom;
+typedef Symbol t_symbol;
 
 /// enable/disable traces
 static bool _enable_trace = false;

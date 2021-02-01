@@ -75,9 +75,11 @@ static void def_ls_bang(t_def_ls *x)
         "(speakers also upward and/or downward");
 }
 
+
+
 /*----------------------------------------------------------------------------*/
 // when loudspeaker triplets come in a message
-static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
+static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
 {
   int i;
   t_ls_set *trip_ptr, *tmp_ptr;
@@ -139,7 +141,7 @@ static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 }
 
 // when loudspeaker directions come in a message
-static void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, Atom *av)
+static void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
 {
   (void)s; // silence unused parameter warning
   if (x->x_ls_read)
@@ -170,7 +172,7 @@ static void ls_angles_to_cart(t_ls *ls)
 
 // create new instance of object...
 // MUST send it an int even if you do nothing with this int!!
-static void *def_ls_new(t_symbol *s, int ac, Atom *av)
+static void *def_ls_new(t_symbol *s, int ac, t_atom *av)
 {
   (void)s; // silence unused parameter warning
   t_def_ls *x = (t_def_ls *)newobject(def_ls_class);
@@ -187,7 +189,7 @@ static void *def_ls_new(t_symbol *s, int ac, Atom *av)
 }
 
 // define-loudspeakers message integrated into vbap object
-void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, Atom *av)
+void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
 {
   (void)s; // silence unused parameter warning
 
@@ -201,7 +203,7 @@ void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 }
 
 // initialize the object content from parameters: ls-directions list
-static void initContent_ls_directions(t_def_ls *x, int ac, Atom *av)
+static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av)
 {
   x->x_ls_read = 0;
   int i, pointer = 1;
@@ -599,7 +601,7 @@ static void calculate_3x3_matrixes(t_def_ls *x)
   t_float *invmx;
   struct t_ls_set *tr_ptr = x->x_ls_set;
   unsigned long triplet_amount = 0, i, pointer, list_length = 0;
-  Atom *at;
+  t_atom *at;
   t_ls *lss = x->x_ls;
 
   if (tr_ptr == NULL)
@@ -616,7 +618,7 @@ static void calculate_3x3_matrixes(t_def_ls *x)
   }
   tr_ptr = x->x_ls_set;
   list_length = triplet_amount * 21 + 3;
-  at = (Atom *)getbytes(list_length * sizeof(Atom));
+  at = (t_atom *)getbytes(list_length * sizeof(t_atom));
 
   SETLONG(&at[0], x->x_def_ls_dimension);
   SETLONG(&at[1], x->x_def_ls_amount);
@@ -668,7 +670,7 @@ static void calculate_3x3_matrixes(t_def_ls *x)
 
   sendLoudspeakerMatrices(x, list_length, at);
 
-  freebytes(at, list_length * sizeof(Atom));
+  freebytes(at, list_length * sizeof(t_atom));
 }
 
 // selects the loudspeaker pairs, calculates the inversion matrices and stores
@@ -684,7 +686,7 @@ static void choose_ls_tuplets(t_def_ls *x)
   t_ls *lss = x->x_ls;
   long ls_amount = x->x_def_ls_amount;
   long list_length;
-  Atom *at;
+  t_atom *at;
   long pointer;
 
   for (i = 0; i < MAX_LS_AMOUNT; i++)
@@ -721,7 +723,7 @@ static void choose_ls_tuplets(t_def_ls *x)
 
   // output
   list_length = amount * 10 + 2;
-  at = (Atom *)getbytes(list_length * sizeof(Atom));
+  at = (t_atom *)getbytes(list_length * sizeof(t_atom));
 
   SETLONG(&at[0], x->x_def_ls_dimension);
   SETLONG(&at[1], x->x_def_ls_amount);
@@ -764,7 +766,7 @@ static void choose_ls_tuplets(t_def_ls *x)
   }
 
   sendLoudspeakerMatrices(x, list_length, at);
-  freebytes(at, list_length * sizeof(Atom));
+  freebytes(at, list_length * sizeof(t_atom));
 }
 
 // sort loudspeakers according to azimuth angle
