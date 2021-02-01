@@ -14,8 +14,8 @@ See copyright in file with name LICENSE.txt */
 
 #ifdef MAXMSP
 #include "ext.h"
-#define t_float float
-#define pd_error(x, ...) post(__VA_ARGS__)
+# define t_float float
+# define pd_error(x, ...) post(__VA_ARGS__)
 #endif
 
 #ifdef PD

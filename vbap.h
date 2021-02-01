@@ -8,28 +8,28 @@
 #ifdef PD
 
 /* Pd doesn't have longs */
-#define SETLONG SETFLOAT
+# define SETLONG SETFLOAT
 
-#define atom_getlong(atom)          atom_getfloatarg(0, 1, atom)
-#define atom_getsym(atom)           atom_getsymbolarg(0, 1, atom)
-#define object_alloc(obj_class)     pd_new(obj_class)
-#define object_free(obj)            pd_free((t_pd*)obj)
-#define newobject(class)            pd_new(class)
-#define outlet_int(outlet, number)  outlet_float(outlet, number)
+# define atom_getlong(atom)          atom_getfloatarg(0, 1, atom)
+# define atom_getsym(atom)           atom_getsymbolarg(0, 1, atom)
+# define object_alloc(obj_class)     pd_new(obj_class)
+# define object_free(obj)            pd_free((t_pd*)obj)
+# define newobject(class)            pd_new(class)
+# define outlet_int(outlet, number)  outlet_float(outlet, number)
 
-#else // MAX
+# else // MAX
 
 /* name changes */
 typedef Atom t_atom;
 typedef Symbol t_symbol;
-#define SETSYMBOL SETSYM
+# define SETSYMBOL SETSYM
 
 /// enable/disable traces
 static bool _enable_trace = false;
 void traces(t_def_ls *x, long n) { _enable_trace = n ? true : false;}
 
 /// pd_error -> post
-#define pd_error(x, ...) post(__VA_ARGS__)
+# define pd_error(x, ...) post(__VA_ARGS__)
 
 #endif // PD vs MAX
 
@@ -37,43 +37,30 @@ void traces(t_def_ls *x, long n) { _enable_trace = n ? true : false;}
 
 #ifndef M_PI
 // don't know where it is in win32, so add it here
-#define M_PI 3.14159265358979323846264338327950288
+# define M_PI 3.14159265358979323846264338327950288
 #endif
 
+
+// maximum number of loudspeaker sets (triplets or pairs) allowed,
 // revised by Z. Settel to dynamically allocate memory
-#ifdef PD
-
-// maximum number of loudspeaker sets (triplets or pairs) allowed,
+#ifndef MAX_LS_SETS
+# ifdef PD
 // allows for up to 44 speakers in 3D config
-#ifndef MAX_LS_SETS
-  #define MAX_LS_SETS 745
-#endif
-
-// former maximum value crashed for 3D speaker configurations
-// with more than 13 speakers
-//#define MAX_LS_SETS 100
-
-// example: for up to 32 speakers in 3D config
-//#define MAX_LS_SETS 571
-
-#else // MAX
-
-// maximum number of loudspeaker sets (triplets or pairs) allowed,
+#  define MAX_LS_SETS 745
+# else // MAX
 // this can crash when too many speakers are defined
-#ifndef MAX_LS_SETS
-  #define MAX_LS_SETS 100
-#endif
-
-#endif // PD
+#  define MAX_LS_SETS 100
+# endif // PD vs MAX
+#endif // MAX_LS_SETS
 
 // maximum amount of loudspeakers, can be increased,
 // but see MAX_LS_SETS comments above
 #ifndef MAX_LS_AMOUNT
-#define MAX_LS_AMOUNT 55
+# define MAX_LS_AMOUNT 55
 #endif
 
-#define MATRIX_DIM 9      //< hard-coded matrix dimension for the algorithm
-#define SPEAKER_SET_DIM 3 //< hard-coded speaker set dimension for the algorithm
+#define MATRIX_DIM          9 //< hard-coded matrix dimension for the algorithm
+#define SPEAKER_SET_DIM     3 //< hard-coded speaker set dimension for the algorithm
 #define MIN_VOL_P_SIDE_LGTH 0.01
 
 #define VBAP_VERSION \
@@ -87,12 +74,12 @@ static t_float atorad = (2.0f * M_PI) / 360.0f;
 #ifdef VBAP_OBJECT
 // inside vbap object, so sending matrix from define_loudspeakers
 // is a simple call to the vbap receiver...
-#define sendLoudspeakerMatrices(x, list_length, at) \
+# define sendLoudspeakerMatrices(x, list_length, at) \
       vbap_matrix(x, gensym("loudspeaker-matrices"), list_length, at); \
       vbap_bang(x)
 #else
 // inside define_loudspeaker object, send matrix to outlet
-#define sendLoudspeakerMatrices(x, list_length, at) \
+# define sendLoudspeakerMatrices(x, list_length, at) \
     outlet_anything(x->x_outlet0, gensym("loudspeaker-matrices"), \
       list_length, at)
 #endif
