@@ -274,7 +274,7 @@ static void initContent_ls_directions(t_def_ls *x, int ac, t_atom *av)
   else
   {
     x->x_def_ls_dimension = 0;
-    pd_error(x, "define-loudspeakers: dimension has to be 2 or 3");
+    pd_error(x, "define-loudspeakers: dimension has to be 2 or 3, not %ld", d);
     return;
   }
 
