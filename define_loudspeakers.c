@@ -80,7 +80,7 @@ static void def_ls_bang(t_def_ls *x)
 static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
 {
   int i;
-  t_ls_set *trip_ptr, *tmp_ptr, *prev;
+  t_ls_set *trip_ptr, *tmp_ptr;
 
   (void)s; // silence unused parameter warning
   if(x->x_ls_read == 0)
@@ -97,7 +97,6 @@ static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, Atom *av)
   }
 
   trip_ptr = x->x_ls_set;
-  prev = NULL;
   while (trip_ptr != NULL)
   {
     tmp_ptr = trip_ptr;

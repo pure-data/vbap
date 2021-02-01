@@ -388,7 +388,6 @@ static void additive_vbap(t_float *final_gs, t_float cartdir[3], t_rvbap *x)
   int i, j, k, gains_modified;
   t_float small_g;
   t_float big_sm_g, gtmp[3];
-  long winner_set;
   long dim = x->x_dimension;
   long neg_g_am, best_neg_g_am;
   t_float g[3] = {0, 0, 0};
@@ -415,7 +414,6 @@ static void additive_vbap(t_float *final_gs, t_float cartdir[3], t_rvbap *x)
     {
       big_sm_g = small_g;
       best_neg_g_am = neg_g_am;
-      winner_set = i;
       g[0] = gtmp[0]; g[1] = gtmp[1];
       ls[0] = x->x_lsset[i][0]; ls[1] = x->x_lsset[i][1];
       if (dim == 3)
