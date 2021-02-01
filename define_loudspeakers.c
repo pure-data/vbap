@@ -13,8 +13,6 @@ See copyright in file with name LICENSE.txt */
 
 static t_class *def_ls_class;
 static void def_ls_bang(t_def_ls *x);
-static void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, t_atom *av);
-static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av);
 static void *def_ls_new(t_symbol *s, int ac, t_atom *av);
 static void ls_angles_to_cart(t_ls *ls);
 static void choose_ls_triplets(t_def_ls *x);
@@ -153,7 +151,7 @@ static void def_ls_bang(t_def_ls *x)
 
 /*----------------------------------------------------------------------------*/
 // when loudspeaker triplets come in a message
-static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
+void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
 {
   int i;
   t_ls_set *trip_ptr, *tmp_ptr;
@@ -194,7 +192,7 @@ static void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
 }
 
 // when loudspeaker directions come in a message
-static void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
+void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, t_atom *av)
 {
   (void)s; // silence unused parameter warning
   if (x->x_ls_read)

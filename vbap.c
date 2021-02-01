@@ -39,9 +39,6 @@ static void vbap(t_float g[3], long ls[3], t_vbap *x);
 static void angle_to_cart(t_float azi, t_float ele, t_float res[3]);
 static void cart_to_angle(t_float cvec[3], t_float avec[3]);
 
-// include define_loudspeakers directly into VBAP
-#include "define_loudspeakers.c"
-
 // Max object assist
 #ifndef PD // MAX
 void vbap_assist(t_vbap *x, void *b, long m, long a, char *s)

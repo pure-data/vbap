@@ -186,3 +186,5 @@ typedef struct t_ls_set
 
 
 void vbap_def_ls(t_def_ls *x, t_symbol *s, int ac, t_atom *av);
+void def_ls_read_directions(t_def_ls *x, t_symbol *s, int ac, t_atom *av);
+void def_ls_read_triplets(t_def_ls *x, t_symbol *s, int ac, t_atom *av);
