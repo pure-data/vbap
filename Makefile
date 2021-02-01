@@ -6,7 +6,8 @@
 lib.name = vbap
 
 # input source file (class name == source file basename)
-class.sources = vbap.c rvbap.c define_loudspeakers.c
+class.sources = rvbap.c define_loudspeakers.c
+vbap.class.sources = vbap.c define_loudspeakers.c
 
 # all extra files to be included in binary distribution of the library
 datafiles = define_loudspeakers.h max2pd.h vbap.h \
