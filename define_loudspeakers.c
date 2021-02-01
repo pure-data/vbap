@@ -653,7 +653,7 @@ static void calculate_3x3_matrixes(t_def_ls *x)
     tr_ptr = tr_ptr->next;
   }
   tr_ptr = x->x_ls_set;
-  list_length = triplet_amount * 21 + 3;
+  list_length = triplet_amount * 21 + 2;
   at = (t_atom *)getbytes(list_length * sizeof(t_atom));
 
   SETLONG(&at[0], x->x_def_ls_dimension);
