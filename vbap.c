@@ -151,6 +151,7 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
   floatinlet_new(&x->x_obj, &x->x_azi);
   floatinlet_new(&x->x_obj, &x->x_ele);
   floatinlet_new(&x->x_obj, &x->x_spread);
+  floatinlet_new(&x->x_obj, &x->x_gain);
 
   x->x_outlet0 = outlet_new(&x->x_obj, &s_float);
   x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
