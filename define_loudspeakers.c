@@ -10,8 +10,8 @@ See copyright in file with name LICENSE.txt */
 #include "define_loudspeakers.h"
 #include <float.h>
 
-#ifndef VBAP_OBJECT
 #ifdef PD
+# ifndef VBAP_OBJECT
 // if we are within vbap (which includes define_loudspeakers),
 // then don't create a main for define_loudspeakers
 void define_loudspeakers_setup(void)
@@ -27,7 +27,9 @@ void define_loudspeakers_setup(void)
 
   post(DFLS_VERSION);
 }
+# endif
 #else // MAX
+# ifndef VBAP_OBJECT
 void main(void)
 {
   setup((t_messlist **)&def_ls_class, (method)def_ls_new, 0L,
@@ -40,8 +42,8 @@ void main(void)
 
   post(DFLS_VERSION);
 }
-#endif // PD
-#endif // !VBAP_OBJECT
+# endif // !VBAP_OBJECT
+#endif // PD vs MAX
 
 // calculate and print out chosen loudspeaker sets and corresponding matrices
 static void def_ls_bang(t_def_ls *x)
