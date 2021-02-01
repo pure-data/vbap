@@ -186,8 +186,8 @@ typedef struct t_ls_set
     long x_lsset[MAX_LS_SETS][3];
 
     long x_spread; //< speading amount of virtual source (0-100)
-    double x_gain; //< general gain control (0-2)
 #endif // PD
+    double x_gain; //< general gain control (0-2)
 
     t_float x_spread_base[3]; //< used to create uniform spreading
 

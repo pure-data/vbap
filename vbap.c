@@ -192,6 +192,8 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
   x->x_ele = ele;
   x->x_spread = spread;
 
+  x->x_gain = 1;
+
   return x; // return a reference to the object instance
 }
 
@@ -719,15 +721,9 @@ static void vbap_bang(t_vbap *x)
       spread_it(x,final_gs);
     for (i = 0; i < x->x_ls_amount; i++)
     {
-#ifdef PD
-      SETFLOAT(&at[0], (t_float)i);
-      SETFLOAT(&at[1], (t_float)final_gs[i]);
-      outlet_list(x->x_obj.ob_outlet, &s_list, 2, at);
-#else // MAX
       SETLONG(&at[0], i);
-      SETFLOAT(&at[1], final_gs[i]*x->x_gain); // gain is applied here
-      outlet_list(x->x_outlet0, 0L, 2, at);
-#endif // PD
+      SETFLOAT(&at[1], (t_float)(final_gs[i]*x->x_gain)); // gain is applied here
+      outlet_list(x->x_outlet0, gensym("list"), 2, at);
     }
     outlet_float(x->x_outlet1, x->x_azi);
     outlet_float(x->x_outlet2, x->x_ele);
