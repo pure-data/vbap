@@ -153,11 +153,11 @@ static void *vbap_new(t_float azi, t_float ele, t_float spread)
   floatinlet_new(&x->x_obj, &x->x_spread);
   floatinlet_new(&x->x_obj, &x->x_gain);
 
-  x->x_outlet0 = outlet_new(&x->x_obj, &s_float);
+  x->x_outlet0 = outlet_new(&x->x_obj, &s_list);
   x->x_outlet1 = outlet_new(&x->x_obj, &s_float);
   x->x_outlet2 = outlet_new(&x->x_obj, &s_float);
   x->x_outlet3 = outlet_new(&x->x_obj, &s_float);
-  x->x_outlet4 = outlet_new(&x->x_obj, 0);
+  x->x_outlet4 = outlet_new(&x->x_obj, &s_float);
 
   // allocate space for the runtime matricies
 //if (!vbap_getmem(x, MAX_LS_SETS))
