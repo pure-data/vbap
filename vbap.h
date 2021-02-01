@@ -3,6 +3,38 @@
 #include <math.h>
 #include "m_pd.h"
 
+
+// umlaeute: helper macros to ease compat between Pd and Max-versions
+#ifdef PD
+
+/* Pd doesn't have longs */
+#define SETLONG SETFLOAT
+
+#define atom_getlong(atom)          atom_getfloatarg(0, 1, atom)
+#define atom_getsym(atom)           atom_getsymbolarg(0, 1, atom)
+#define object_alloc(obj_class)     pd_new(obj_class)
+#define object_free(obj)            pd_free((t_pd*)obj)
+#define newobject(class)            pd_new(class)
+#define outlet_int(outlet, number)  outlet_float(outlet, number)
+
+#else // MAX
+
+/* name changes */
+typedef Atom t_atom;
+typedef Symbol t_symbol;
+#define SETSYMBOL SETSYM
+
+/// enable/disable traces
+static bool _enable_trace = false;
+void traces(t_def_ls *x, long n) { _enable_trace = n ? true : false;}
+
+/// pd_error -> post
+#define pd_error(x, ...) post(__VA_ARGS__)
+
+#endif // PD vs MAX
+
+
+
 #ifndef M_PI
 // don't know where it is in win32, so add it here
 #define M_PI 3.14159265358979323846264338327950288
@@ -166,35 +198,3 @@ typedef struct t_ls_set
 #endif // VBAP_OBJECT
 
 
-// umlaeute: helper macros to ease compat between Pd and Max-versions
-#ifdef PD
-
-/* Pd doesn't have longs */
-#define SETLONG SETFLOAT
-
-#define atom_getlong(atom)          atom_getfloatarg(0, 1, atom)
-#define atom_getsym(atom)           atom_getsymbolarg(0, 1, atom)
-#define object_alloc(obj_class)     pd_new(obj_class)
-#define object_free(obj)            pd_free((t_pd*)obj)
-#define newobject(class)            pd_new(class)
-#define outlet_int(outlet, number)  outlet_float(outlet, number)
-
-
-
-#else // MAX
-
-/* name changes */
-typedef Atom t_atom;
-typedef Symbol t_symbol;
-#define SETSYMBOL SETSYM
-
-/// enable/disable traces
-static bool _enable_trace = false;
-void traces(t_def_ls *x, long n) { _enable_trace = n ? true : false;}
-
-/// pd_error -> post
-#define pd_error(x, ...) post(__VA_ARGS__)
-
-
-
-#endif // PD vs MAX
